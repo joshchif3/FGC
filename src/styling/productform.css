@@ -1,0 +1,86 @@
+/* General form container */
+.product-form-container {
+    width: 80%;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #f4f7fa;
+    border-radius: 10px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Header for the form */
+.product-form-header {
+    text-align: center;
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Form layout */
+.product-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* Label styling */
+.product-form label {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #555;
+}
+
+/* Input fields and selects */
+.product-form input,
+.product-form select,
+.product-form textarea {
+    padding: 12px;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
+    transition: border 0.3s ease;
+}
+
+/* Focus state for inputs */
+.product-form input:focus,
+.product-form select:focus,
+.product-form textarea:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+/* Textarea styling */
+.product-form textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Submit button */
+.product-form button {
+    padding: 14px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Hover effect on submit button */
+.product-form button:hover {
+    background-color: #2980b9;
+}
+
+/* Hide the spin buttons on number inputs */
+.product-form input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.product-form input[type="number"]::-webkit-outer-spin-button,
+.product-form input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
