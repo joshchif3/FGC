@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
 
   const fetchUser = async () => {
     try {
-      const response = await axios.get("http://localhost:8081/users/me");
+      const response = await axios.get("https://gc-backend-1.onrender.com/users/me");
       setUser(response.data);
     } catch (error) {
       console.error("User fetch error:", error);
@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     try {
-      const response = await axios.post("http://localhost:8081/users/login", {
+      const response = await axios.post("https://gc-backend-1.onrender.com/users/login", {
         username,
         password,
       });
@@ -56,7 +56,7 @@ export const AuthProvider = ({ children }) => {
   // Register function for SignUpPage
   const register = async (username, email, password, role) => {
     try {
-      const response = await axios.post("http://localhost:8081/users/register", {
+      const response = await axios.post("https://gc-backend-1.onrender.com/users/register", {
         username,
         email,
         password,
@@ -69,8 +69,6 @@ export const AuthProvider = ({ children }) => {
       throw new Error(error.response?.data?.message || "Registration failed");
     }
   };
-  
-  
 
   const logout = () => {
     localStorage.removeItem("authToken"); // Ensure correct key 'authToken'

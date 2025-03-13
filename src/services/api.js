@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8081"; // Updated to local server
+const API_URL = "https://gc-backend-1.onrender.com"; // Use the production URL
 
 // Create an axios instance
 const api = axios.create({
@@ -27,7 +27,7 @@ api.interceptors.response.use(
       // Handle specific HTTP errors
       if (error.response.status === 401) {
         // Unauthorized: Token is invalid or expired
-        localStorage.removeItem("token");
+        localStorage.removeItem("authToken");
         window.location.href = "/login"; // Redirect to login page
       }
       return Promise.reject(error.response.data);
