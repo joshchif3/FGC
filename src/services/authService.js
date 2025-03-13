@@ -12,16 +12,17 @@ export const AuthProvider = ({ children }) => {
       try {
         const token = localStorage.getItem("token"); // Get token from local storage
         if (!token) {
-          throw new Error("No token found");
+          setLoading(false);
+          return;
         }
 
-        const response = await axios.get("http://localhost:8081/api/auth/user", {
-          headers: { Authorization: `Bearer ${token}` }, // Include token in request
+        const response = await axios.get("https://fgc-wnzg.onrender.com/api/auth/user", {
+          headers: { Authorization: `Bearer ${token}` },
         });
 
         setUser(response.data);
       } catch (error) {
-        console.error("User fetch error:", error);
+        console.error("Error fetching user:", error);
       } finally {
         setLoading(false);
       }
@@ -30,8 +31,23 @@ export const AuthProvider = ({ children }) => {
     fetchUser();
   }, []);
 
+  const login = async (credentials) => {
+    try {
+      const response = await axios.post("https://fgc-wnzg.onrender.com/api/auth/login", credentials);
+      localStorage.setItem("token", response.data.token);
+      setUser(response.data.user);
+    } catch (error) {
+      throw new Error("Login failed");
+    }
+  };
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    setUser(null);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading }}>
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
