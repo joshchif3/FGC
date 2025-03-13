@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8081"; // Backend URL
+const API_URL = "https://fgc-wnzg.onrender.com"; // Correct backend URL
 
 const api = axios.create({
   baseURL: API_URL, // Set the base URL for all requests
@@ -17,6 +17,5 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
-
 
 export default api;
