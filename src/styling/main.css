@@ -15,12 +15,15 @@ body {
   padding: 0;
   background-color: var(--background-color);
   color: var(--text-color);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 .app-container {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  flex: 1; /* This makes the container take up the remaining space */
 }
 
 /* ================== HEADER ================== */
@@ -596,6 +599,7 @@ body {
   color: var(--accent-color);
   padding: 40px 20px;
   text-align: center;
+  margin-top: auto; /* Push the footer to the bottom */
 }
 
 .footer-content {
@@ -1048,4 +1052,29 @@ button:hover {
 
 .order-options .btn:hover {
   background-color: var(--dark-color);
+}
+
+.product-details {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.product-details img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.product-details h2 {
+  font-size: 2rem;
+  color: var(--primary-color);
+  margin-bottom: 10px;
+}
+
+.product-details p {
+  font-size: 1.2rem;
+  color: var(--text-color);
 }

@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
       });
 
       if (response.data?.token) {
-        localStorage.setItem("authToken", response.data.token); // Correctly store the token
+        localStorage.setItem("authToken", response.data.token); // Store the token
         axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
         setUser(response.data);
         navigate("/dashboard");
@@ -53,7 +53,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Register function for SignUpPage
   const register = async (username, email, password, role) => {
     try {
       const response = await axios.post("https://gc-backend-1.onrender.com/users/register", {
@@ -62,7 +61,7 @@ export const AuthProvider = ({ children }) => {
         password,
         role,
       });
-  
+
       navigate("/login"); // Redirect to login after successful registration
     } catch (error) {
       console.error("Registration error:", error.response?.data || error.message);
@@ -71,7 +70,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem("authToken"); // Ensure correct key 'authToken'
+    localStorage.removeItem("authToken"); // Remove token
     delete axios.defaults.headers.common["Authorization"];
     setUser(null);
     navigate("/login");
