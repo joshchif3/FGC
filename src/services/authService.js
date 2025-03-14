@@ -16,7 +16,8 @@ export const AuthProvider = ({ children }) => {
           return;
         }
 
-        const response = await axios.get("https://fgc-wnzg.onrender.com/api/auth/user", {
+        // Fetch user details from the correct backend URL
+        const response = await axios.get("https://gc-backend-1.onrender.com/api/auth/user", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -33,7 +34,8 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     try {
-      const response = await axios.post("https://fgc-wnzg.onrender.com/api/auth/login", credentials);
+      // Send login request to the correct backend URL
+      const response = await axios.post("https://gc-backend-1.onrender.com/api/auth/login", credentials);
       localStorage.setItem("token", response.data.token);
       setUser(response.data.user);
     } catch (error) {

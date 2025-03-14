@@ -28,33 +28,31 @@ function Design() {
       reader.onerror = (error) => reject(error);
     });
 
-    const uploadDesign = async (payload) => {
-      try {
-        // Fetch the correct token
-        const token = localStorage.getItem("authToken");
-    
-        console.log("🔑 Token being sent:", token); // Now it should log the token
-    
-        if (!token) {
-          throw new Error("❌ No authentication token found. Please log in.");
-        }
-    
-        const response = await api.post("/api/designs/upload", payload, {
-          headers: {
-            Authorization: `Bearer ${token}`, // Attach the token correctly
-          },
-        });
-    
-        console.log("✅ Upload Successful:", response.data);
-        return response.data;
-      } catch (error) {
-        console.error("❌ Error uploading design:", error);
-        if (error.response) {
-          console.error("❌ Server Response:", error.response.data);
-        }
-        throw error;
+  // Upload design function
+  const uploadDesign = async (payload) => {
+    try {
+      const token = localStorage.getItem("authToken");
+
+      if (!token) {
+        throw new Error("❌ No authentication token found. Please log in.");
       }
-    };
+
+      const response = await api.post("/api/designs/upload", payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log("✅ Upload Successful:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("❌ Error uploading design:", error);
+      if (error.response) {
+        console.error("❌ Server Response:", error.response.data);
+      }
+      throw error;
+    }
+  };
 
   // Use Mutation Hook
   const { mutateAsync, isLoading, isError, error } = useMutation({
@@ -69,18 +67,21 @@ function Design() {
         throw new Error("❌ Please upload a design file.");
       }
 
+      // Convert the file to Base64
       const fileBase64 = await toBase64(designFile);
 
+      // Prepare the payload
       const payload = {
         colors,
-        quantity,
+        quantity: parseInt(quantity, 10), // Ensure quantity is a number
         sizes,
         designFile: fileBase64,
-        userId: user?.userId,
+        userId: user?.userId, // Use the logged-in user's ID
       };
 
       console.log("📤 Sending payload:", payload);
 
+      // Upload the design
       await mutateAsync(payload);
       alert("✅ Design uploaded successfully!");
     } catch (error) {
@@ -121,15 +122,36 @@ function Design() {
       <form className="order-details" onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="colors">Colors:</label>
-          <input type="text" id="colors" value={colors} onChange={(e) => setColors(e.target.value)} placeholder="Enter colors (e.g., Red, Blue)" required />
+          <input
+            type="text"
+            id="colors"
+            value={colors}
+            onChange={(e) => setColors(e.target.value)}
+            placeholder="Enter colors (e.g., Red, Blue)"
+            required
+          />
         </div>
         <div className="form-group">
           <label htmlFor="quantity">Quantity:</label>
-          <input type="number" id="quantity" value={quantity} onChange={(e) => setQuantity(e.target.value)} placeholder="Enter quantity" required />
+          <input
+            type="number"
+            id="quantity"
+            value={quantity}
+            onChange={(e) => setQuantity(e.target.value)}
+            placeholder="Enter quantity"
+            required
+          />
         </div>
         <div className="form-group">
           <label htmlFor="sizes">Sizes:</label>
-          <input type="text" id="sizes" value={sizes} onChange={(e) => setSizes(e.target.value)} placeholder="Enter sizes (e.g., S, M, L)" required />
+          <input
+            type="text"
+            id="sizes"
+            value={sizes}
+            onChange={(e) => setSizes(e.target.value)}
+            placeholder="Enter sizes (e.g., S, M, L)"
+            required
+          />
         </div>
 
         <div className="order-options">

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://fgc-wnzg.onrender.com"; // Correct backend URL
+const API_URL = "https://gc-backend-1.onrender.com"; // Correct backend URL
 
 const api = axios.create({
   baseURL: API_URL, // Set the base URL for all requests
