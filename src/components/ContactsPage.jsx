@@ -24,8 +24,8 @@ function ContactsPage() {
     // Send form data to EmailJS
     emailjs
       .sendForm(
-        "service_r51ln6j", // Updated Service ID
-        "template_t9eqsqe", // Replace with your template ID
+        "service_3blbxn8", // Updated Service ID
+        "template_escp5xc", // Replace with your template ID
         e.target, // This will automatically map the form fields to template variables
         "UNjfGikVEcTG6vuKO" // Replace with your user ID from EmailJS
       )
