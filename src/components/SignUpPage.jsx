@@ -75,6 +75,15 @@ function SignUpPage() {
     }
   };
 
+  // Password requirements
+  const passwordRequirements = [
+    { id: 1, text: "At least 8 characters", valid: password.length >= 8 },
+    { id: 2, text: "At least one uppercase letter", valid: /[A-Z]/.test(password) },
+    { id: 3, text: "At least one lowercase letter", valid: /[a-z]/.test(password) },
+    { id: 4, text: "At least one number", valid: /\d/.test(password) },
+    { id: 5, text: "At least one special character", valid: /[@$!%*?&]/.test(password) },
+  ];
+
   return (
     <div className="auth-container">
       <div className="auth-box">
@@ -102,6 +111,17 @@ function SignUpPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+          {/* Password Requirements */}
+          <div className="password-requirements">
+            <p>Password must meet the following requirements:</p>
+            <ul>
+              {passwordRequirements.map((req) => (
+                <li key={req.id} className={req.valid ? "valid" : "invalid"}>
+                  {req.text}
+                </li>
+              ))}
+            </ul>
+          </div>
           <button type="submit">Sign Up</button>
         </form>
       </div>
