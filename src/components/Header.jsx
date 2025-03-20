@@ -1,14 +1,14 @@
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import { CartContext } from "../services/CartContext.jsx";
-import { useAuth } from "../services/AuthContext.jsx"; // Correct import
+import { useAuth } from "../services/AuthContext.jsx";
 
 function Header() {
   const { cartItems } = useContext(CartContext);
-  const { user, logout } = useAuth(); // Use the useAuth hook
+  const { user, logout } = useAuth();
 
   const handleLogout = () => {
-    logout(); // Call the logout function from AuthContext
+    logout();
   };
 
   return (
@@ -20,7 +20,7 @@ function Header() {
         <nav>
           <ul>
             <li><Link to="/">Home</Link></li>
-            <li><Link to="/design">Design</Link></li> {/* Added Design Link */}
+            <li><Link to="/design">Design</Link></li>
             <li><Link to="/contact">Contact</Link></li>
             <li><Link to="/products">Products</Link></li>
             {user ? (
@@ -29,17 +29,15 @@ function Header() {
                 {user.role === "ADMIN" && <li><Link to="/admin">Admin</Link></li>}
               </>
             ) : (
-              <>
-                <li><Link to="/login">Login</Link></li>
-                <li><Link to="/signup">Sign Up</Link></li>
-              </>
+              <li>
+                <li>
+  <Link to="/login">
+     Login <span className="material-icons">person</span>
+  </Link>
+</li>
+              </li>
             )}
-            <li className="cart-icon">
-              <Link to="/cart">
-                🛒
-                {cartItems.length > 0 && <span className="cart-count">{cartItems.length}</span>}
-              </Link>
-            </li>
+            
           </ul>
         </nav>
       </div>

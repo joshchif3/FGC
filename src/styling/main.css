@@ -53,6 +53,8 @@ body {
   color: var(--accent-color);
   text-decoration: none;
   font-weight: bold;
+  font-size:x-large;
+  
 }
 
 .header nav ul li a:hover {
@@ -1077,4 +1079,21 @@ button:hover {
 .product-details p {
   font-size: 1.2rem;
   color: var(--text-color);
+}
+
+/* ================== SIGN UP LINK ================== */
+.auth-box p {
+  margin-top: 15px;
+  font-size: 1rem;
+  color: var(--text-color);
+}
+
+.auth-box p a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.auth-box p a:hover {
+  text-decoration: underline;
 }

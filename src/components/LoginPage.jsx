@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../services/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
@@ -43,6 +43,9 @@ const LoginPage = () => {
           />
           <button type="submit">Login</button>
         </form>
+        <p>
+          Don't have an account? <Link to="/signup">Sign Up</Link>
+        </p>
       </div>
     </div>
   );
