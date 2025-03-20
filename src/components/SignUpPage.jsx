@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useAuth } from "../services/AuthContext";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function SignUpPage() {
   const [username, setUsername] = useState("");
@@ -28,38 +29,51 @@ function SignUpPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-  
+
     // Validation
     if (!validateUsername(username)) {
       setError("Username must be 3-20 characters long and contain only letters, numbers, and underscores.");
       return;
     }
-  
+
     if (!validateEmail(email)) {
       setError("Please enter a valid email address.");
       return;
     }
-  
+
     if (!validatePassword(password)) {
       setError("Password must be at least 8 characters long and include uppercase, lowercase, numbers, and special characters.");
       return;
     }
-  
+
     try {
       // Try registering the user
-      const response = await register(username, email, password, "USER");
-      console.log("Registration Response:", response); // Log response for debugging
-      navigate("/login"); // Redirect to login page after successful registration
-    } catch (error) {
-      if (error.response && error.response.status === 409) {
-        setError("Username already exists. Please choose a different username.");
+      const response = await axios.post("https://gc-backend-1.onrender.com/users/register", {
+        username,
+        email,
+        password,
+      });
+
+      // Check if registration was successful
+      if (response.data.message === "Registration successful") {
+        navigate("/login"); // Redirect to login page after successful registration
       } else {
-        setError(error.message || "Registration failed. Please try again.");
+        setError("Registration failed. Please try again.");
+      }
+    } catch (error) {
+      if (error.response) {
+        // Handle specific HTTP errors
+        if (error.response.status === 409) {
+          setError("Username already exists. Please choose a different username.");
+        } else {
+          setError(error.response.data.message || "Registration failed. Please try again.");
+        }
+      } else {
+        setError("An unexpected error occurred. Please try again.");
       }
       console.error("Registration error:", error);
     }
   };
-  
 
   return (
     <div className="auth-container">

@@ -53,16 +53,19 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (username, email, password, role) => {
+  const register = async (username, email, password) => {
     try {
       const response = await axios.post("https://gc-backend-1.onrender.com/users/register", {
         username,
         email,
         password,
-        role,
       });
 
-      navigate("/login"); // Redirect to login after successful registration
+      if (response.data.message === "Registration successful") {
+        navigate("/login"); // Redirect to login page after successful registration
+      } else {
+        throw new Error("Registration failed. Please try again.");
+      }
     } catch (error) {
       console.error("Registration error:", error.response?.data || error.message);
       throw new Error(error.response?.data?.message || "Registration failed");
