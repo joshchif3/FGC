@@ -11,7 +11,7 @@ function Design() {
   const [colors, setColors] = useState("");
   const [quantity, setQuantity] = useState("");
   const [sizes, setSizes] = useState("");
-  const [emailStatus, setEmailStatus] = useState(null); // Track email status separately
+  const [emailStatus, setEmailStatus] = useState(null);
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
@@ -21,7 +21,6 @@ function Design() {
     }
   };
 
-  // Upload design function using FormData (unchanged)
   const uploadDesign = async (formData) => {
     try {
       const token = localStorage.getItem("authToken");
@@ -47,28 +46,40 @@ function Design() {
     }
   };
 
-  // New function to send design details via email
-  const sendDesignEmail = async (designData) => {
+  const sendDesignEmail = async (designData, responseData) => {
     try {
+      // Convert image to base64 if preview exists
+      let designFileBase64 = "Not available";
+      if (designPreview) {
+        const response = await fetch(designPreview);
+        const blob = await response.blob();
+        designFileBase64 = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result.split(',')[1]);
+          reader.readAsDataURL(blob);
+        });
+      }
+
       const emailParams = {
         to_name: "Glorious Creations Team",
         from_name: user?.username || "Customer",
         from_email: user?.email || "customer@example.com",
-        design_details: `
-          New Design Submission:
-          - Colors: ${designData.colors}
-          - Quantity: ${designData.quantity}
-          - Sizes: ${designData.sizes}
-          - User ID: ${user?.userId || "N/A"}
-        `,
+        design_details: JSON.stringify({
+          id: responseData.id || "N/A",
+          colors: designData.colors,
+          quantity: designData.quantity,
+          sizes: designData.sizes,
+          designFile: designFileBase64,
+          userId: user?.userId || "N/A"
+        }, null, 2),
         reply_to: user?.email || "customer@example.com"
       };
 
       await emailjs.send(
-        "service_oi6vx5n", // Your Fastmail service ID
-        "template_vzyxdek", // Your template ID
+        "service_oi6vx5n",
+        "template_vzyxdek",
         emailParams,
-        "UNjfGikVEcTG6vuKO" // Your EmailJS user ID
+        "UNjfGikVEcTG6vuKO"
       );
       
       setEmailStatus({ success: true, message: "✅ Design details emailed successfully!" });
@@ -79,21 +90,19 @@ function Design() {
     }
   };
 
-  // Use Mutation Hook (unchanged)
   const { mutateAsync, isLoading, isError, error } = useMutation({
     mutationFn: uploadDesign,
   });
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setEmailStatus(null); // Reset email status on new submission
+    setEmailStatus(null);
 
     try {
       if (!designFile) {
         throw new Error("❌ Please upload a design file.");
       }
 
-      // Prepare FormData payload (unchanged)
       const formData = new FormData();
       formData.append("colors", colors);
       formData.append("quantity", parseInt(quantity, 10));
@@ -103,11 +112,14 @@ function Design() {
 
       console.log("📤 Sending FormData:", formData);
 
-      // Upload the design (unchanged)
-      await mutateAsync(formData);
+      // Upload the design and get response
+      const response = await mutateAsync(formData);
       
-      // Send email with design details
-      await sendDesignEmail({ colors, quantity, sizes });
+      // Send email with complete design details
+      await sendDesignEmail(
+        { colors, quantity, sizes },
+        { id: response.id }
+      );
       
       alert("✅ Design uploaded and details emailed successfully!");
     } catch (error) {
@@ -187,7 +199,6 @@ function Design() {
         </div>
       </form>
 
-      {/* Display email status separately from upload status */}
       {emailStatus && (
         <div className={`status-message ${emailStatus.success ? "success" : "error"}`}>
           {emailStatus.message}
