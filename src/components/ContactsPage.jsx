@@ -60,7 +60,7 @@ function ContactsPage() {
         <div className="contact-manager-info">
           <h3>Contact Us</h3>
           <div className="contact-manager-details">
-            <p>Email: <a href="mailto:gc_mail@fastmail.com">info@gloriouscreations.com</a></p>
+            <p>Email: <a href="mailto:gc_mail@fastmail.com">gc_mail@fastmail.com</a></p>
             <p>Phone: <a href="tel:+27825251386">+27 (82) 525-1386</a></p>
           </div>
         </div>
