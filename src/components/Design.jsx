@@ -46,37 +46,8 @@ function Design() {
     }
   };
 
-  const getBase64Image = async (imageUrl) => {
-    try {
-      const response = await fetch(imageUrl);
-      const blob = await response.blob();
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.readAsDataURL(blob);
-      });
-    } catch (error) {
-      console.error("Error converting image to base64:", error);
-      return null;
-    }
-  };
-
   const sendDesignEmail = async (designData) => {
     try {
-      // Convert image to base64
-      const base64Image = designPreview ? await getBase64Image(designPreview) : null;
-
-      // Create email content with the exact format requested
-      const emailContent = `Upload Successful: 
-${JSON.stringify({
-  id: designData.id,
-  colors: designData.colors,
-  quantity: designData.quantity,
-  sizes: designData.sizes,
-  designFile: base64Image ? base64Image.split(',')[1] : "No image",
-  userId: designData.userId
-}, null, 2)}`;
-
       // Create a hidden form element
       const form = document.createElement("form");
       form.style.display = "none";
@@ -93,7 +64,7 @@ ${JSON.stringify({
       addField("to_name", "Glorious Creations Team");
       addField("from_name", user?.username || "Customer");
       addField("from_email", user?.email || "customer@example.com");
-      addField("message", emailContent);
+      addField("message", `Upload Successful: ${JSON.stringify(designData, null, 2)}`);
       addField("reply_to", user?.email || "customer@example.com");
 
       document.body.appendChild(form);
@@ -142,10 +113,11 @@ ${JSON.stringify({
         colors: colors,
         quantity: quantity,
         sizes: sizes,
+        designFile: designPreview ? "Image data available" : "No image",
         userId: user?.userId || "N/A"
       };
       
-      // Send email with design details including image data
+      // Send email with design details
       await sendDesignEmail(emailData);
       
       alert("✅ Design uploaded and details emailed successfully!");
