@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useAuth } from "../services/AuthContext";
 import { useMutation } from "@tanstack/react-query";
 import api from "../services/axios";
+import emailjs from "emailjs-com";
 
 function Design() {
   const { user } = useAuth();
@@ -10,6 +11,7 @@ function Design() {
   const [colors, setColors] = useState("");
   const [quantity, setQuantity] = useState("");
   const [sizes, setSizes] = useState("");
+  const [emailStatus, setEmailStatus] = useState(null); // Track email status separately
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
@@ -19,7 +21,7 @@ function Design() {
     }
   };
 
-  // Upload design function using FormData
+  // Upload design function using FormData (unchanged)
   const uploadDesign = async (formData) => {
     try {
       const token = localStorage.getItem("authToken");
@@ -45,20 +47,53 @@ function Design() {
     }
   };
 
-  // Use Mutation Hook
+  // New function to send design details via email
+  const sendDesignEmail = async (designData) => {
+    try {
+      const emailParams = {
+        to_name: "Glorious Creations Team",
+        from_name: user?.username || "Customer",
+        from_email: user?.email || "customer@example.com",
+        design_details: `
+          New Design Submission:
+          - Colors: ${designData.colors}
+          - Quantity: ${designData.quantity}
+          - Sizes: ${designData.sizes}
+          - User ID: ${user?.userId || "N/A"}
+        `,
+        reply_to: user?.email || "customer@example.com"
+      };
+
+      await emailjs.send(
+        "service_oi6vx5n", // Your Fastmail service ID
+        "template_vzyxdek", // Your template ID
+        emailParams,
+        "UNjfGikVEcTG6vuKO" // Your EmailJS user ID
+      );
+      
+      setEmailStatus({ success: true, message: "✅ Design details emailed successfully!" });
+    } catch (error) {
+      console.error("❌ Email sending failed:", error);
+      setEmailStatus({ success: false, message: "❌ Failed to send design email" });
+      throw error;
+    }
+  };
+
+  // Use Mutation Hook (unchanged)
   const { mutateAsync, isLoading, isError, error } = useMutation({
     mutationFn: uploadDesign,
   });
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setEmailStatus(null); // Reset email status on new submission
 
     try {
       if (!designFile) {
         throw new Error("❌ Please upload a design file.");
       }
 
-      // Prepare FormData payload
+      // Prepare FormData payload (unchanged)
       const formData = new FormData();
       formData.append("colors", colors);
       formData.append("quantity", parseInt(quantity, 10));
@@ -68,12 +103,16 @@ function Design() {
 
       console.log("📤 Sending FormData:", formData);
 
-      // Upload the design
+      // Upload the design (unchanged)
       await mutateAsync(formData);
-      alert("✅ Design uploaded successfully!");
+      
+      // Send email with design details
+      await sendDesignEmail({ colors, quantity, sizes });
+      
+      alert("✅ Design uploaded and details emailed successfully!");
     } catch (error) {
-      console.error("❌ Upload Failed:", error);
-      alert(error.message || "❌ Failed to upload design. Check console.");
+      console.error("❌ Submission Failed:", error);
+      alert(error.message || "❌ Failed to process design. Check console.");
     }
   };
 
@@ -143,10 +182,17 @@ function Design() {
 
         <div className="order-options">
           <button type="submit" className="btn" disabled={isLoading}>
-            {isLoading ? "Uploading..." : "Save Design"}
+            {isLoading ? "Processing..." : "Save & Email Design"}
           </button>
         </div>
       </form>
+
+      {/* Display email status separately from upload status */}
+      {emailStatus && (
+        <div className={`status-message ${emailStatus.success ? "success" : "error"}`}>
+          {emailStatus.message}
+        </div>
+      )}
 
       {isError && <div className="error-message">{error.message || "❌ Failed to upload design."}</div>}
     </div>

@@ -1,128 +1,124 @@
 import React, { useState } from "react";
-import { useAuth } from "../services/AuthContext";
-import { useMutation } from "@tanstack/react-query";
-import api from "../services/axios";
-import emailjs from "emailjs-com"; // Add EmailJS import
+import emailjs from "emailjs-com";
+import "../styling/ContactsPage.css";
 
-function Design() {
-  const { user } = useAuth();
-  const [designFile, setDesignFile] = useState(null);
-  const [designPreview, setDesignPreview] = useState(null);
-  const [colors, setColors] = useState("");
-  const [quantity, setQuantity] = useState("");
-  const [sizes, setSizes] = useState("");
-  const [isEmailSent, setIsEmailSent] = useState(false); // Track email status
-
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setDesignFile(file);
-      setDesignPreview(URL.createObjectURL(file));
-    }
-  };
-
-  const uploadDesign = async (formData) => {
-    try {
-      const token = localStorage.getItem("authToken");
-      if (!token) throw new Error("❌ No authentication token found");
-
-      const response = await api.post("/api/designs/upload", formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      return response.data;
-    } catch (error) {
-      console.error("❌ Upload error:", error);
-      throw error;
-    }
-  };
-
-  const sendDesignEmail = async (designData) => {
-    try {
-      await emailjs.send(
-        "service_oi6vx5n", // Your Fastmail service ID
-        "template_vzyxdek", // Your template ID
-        {
-          to_name: "Glorious Creations Team",
-          from_name: user?.username || "Customer",
-          from_email: user?.email || "customer@example.com",
-          message: `
-            New Design Submission:
-            Colors: ${designData.colors}
-            Quantity: ${designData.quantity}
-            Sizes: ${designData.sizes}
-            User ID: ${user?.userId || "N/A"}
-          `,
-          // For file attachments, you would need a different approach
-        },
-        "UNjfGikVEcTG6vuKO" // Your EmailJS user ID
-      );
-      setIsEmailSent(true);
-    } catch (error) {
-      console.error("❌ Email sending failed:", error);
-      throw error;
-    }
-  };
-
-  const { mutateAsync, isLoading, isError, error } = useMutation({
-    mutationFn: uploadDesign,
+function ContactsPage() {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
   });
+  const [isMessageSent, setIsMessageSent] = useState(false); // States to hansdle the success message
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
 
-    try {
-      if (!designFile) throw new Error("❌ Please upload a design file");
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-      const formData = new FormData();
-      formData.append("colors", colors);
-      formData.append("quantity", quantity);
-      formData.append("sizes", sizes);
-      formData.append("designFile", designFile);
-      formData.append("userId", user?.userId);
-
-      // 1. Upload the design
-      await mutateAsync(formData);
-      
-      // 2. Send email notification
-      await sendDesignEmail({ colors, quantity, sizes });
-      
-      alert("✅ Design saved and email sent successfully!");
-    } catch (error) {
-      console.error("❌ Submission failed:", error);
-      alert(error.message || "❌ Failed to process design");
-    }
+    // Send form data to EmailJS
+    emailjs
+      .sendForm(
+        "service_oi6vx5n", // Updated Service ID
+        "template_vzyxdek", // Replace with your template ID
+        e.target, // This will automatically map the form fields to template variables
+        "UNjfGikVEcTG6vuKO" // Replace with your user ID from EmailJS
+      )
+      .then(
+        (result) => {
+          console.log("Message sent: ", result.text);
+          // Set the success message state
+          setIsMessageSent(true);
+          // Optionally, reset the form after a successful submission
+          setFormData({ name: "", email: "", message: "" });
+        },
+        (error) => {
+          console.log("Error sending message: ", error.text);
+          // Optionally, handle error feedback
+        }
+      );
   };
 
   return (
-    <div className="design-page">
-      {/* ... (keep your existing JSX) ... */}
+    <div className="contacts-container">
+      <h2>Contact Us</h2>
 
-      <form className="order-details" onSubmit={handleSubmit}>
-        {/* ... (keep your existing form fields) ... */}
-        
-        <div className="order-options">
-          <button type="submit" className="btn" disabled={isLoading}>
-            {isLoading ? "Processing..." : "Save & Send Design"}
-          </button>
+      {/* Contact Us Section */}
+      <div className="contact-manager-card">
+        <div className="contact-manager-image">
+          <img
+            src="/images/manager.jpg"
+            alt="Sales & Design Manager"
+            className="manager-img"
+          />
         </div>
-      </form>
+        <div className="contact-manager-info">
+          <h3>Contact Us</h3>
+          <div className="contact-manager-details">
+            <p>Email: <a href="mailto:gc_mail@fastmail.com">gc_mail@fastmail.com</a></p>
+            <p>Phone: <a href="tel:+27825251386">+27 (82) 525-1386</a></p>
+          </div>
+        </div>
+      </div>
 
-      {isEmailSent && (
+      {/* Paragraph Section Above the Form cc */}
+      <div className="contact-paragraph">
+        <p>If you have any queries or would like to order a custom design, feel free to reach out to us. Whether you want a t-shirt, hoodie, cap, or any other custom accessory, we are here to help bring your creative ideas to life. Our team is ready to assist you in creating the perfect design for your needs. Let’s work together to create something amazing!</p>
+      </div>
+
+      {/* Success Message */}
+      {isMessageSent && (
         <div className="success-message">
-          Email notification sent successfully!
+          <p>Your message has been sent successfully! We'll get back to you soon.</p>
         </div>
       )}
 
-      {isError && (
-        <div className="error-message">
-          {error.message || "❌ Failed to process design"}
-        </div>
-      )}
+      {/* Contact Form */}
+      <div className="contact-form-container">
+        <h3>Send Us A Message</h3>
+        <form onSubmit={handleSubmit} className="contact-form">
+          <label htmlFor="name">Your Name</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder="Enter your name"
+            required
+          />
+
+          <label htmlFor="email">Your Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="Enter your email"
+            required
+          />
+
+          <label htmlFor="message">Your Message</label>
+          <textarea
+            id="message"
+            name="message"
+            value={formData.message}
+            onChange={handleChange}
+            placeholder="Enter your message"
+            required
+          ></textarea>
+
+          <button type="submit">Send Message</button>
+        </form>
+      </div>
     </div>
   );
 }
 
-export default Design;
+export default ContactsPage;
