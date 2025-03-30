@@ -30,21 +30,21 @@ function SignUpPage() {
     e.preventDefault();
     setError("");
 
-    // Validation
-    if (!validateUsername(username)) {
-      setError("Username must be 3-20 characters long and contain only letters, numbers, and underscores.");
-      return;
-    }
+    // // Validation
+    // if (!validateUsername(username)) {
+    //   setError("Username must be 3-20 characters long and contain only letters, numbers, and underscores.");
+    //   return;
+    // }
 
-    if (!validateEmail(email)) {
-      setError("Please enter a valid email address.");
-      return;
-    }
+    // if (!validateEmail(email)) {
+    //   setError("Please enter a valid email address.");
+    //   return;
+    // }
 
-    if (!validatePassword(password)) {
-      setError("Password must be at least 8 characters long and include uppercase, lowercase, numbers, and special characters.");
-      return;
-    }
+    // if (!validatePassword(password)) {
+    //   setError("Password must be at least 8 characters long and include uppercase, lowercase, numbers, and special characters.");
+    //   return;
+    // }
 
     try {
       // Try registering the user
