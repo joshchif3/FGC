@@ -11,7 +11,7 @@ function Design() {
   const [colors, setColors] = useState("");
   const [quantity, setQuantity] = useState("");
   const [sizes, setSizes] = useState("");
-  const [emailStatus, setEmailStatus] = useState(null);
+  const [isMessageSent, setIsMessageSent] = useState(false);
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
@@ -46,46 +46,40 @@ function Design() {
     }
   };
 
-  const sendDesignEmail = async (designData, responseData) => {
+  const sendDesignEmail = async (designData) => {
     try {
-      // Convert image to base64 if preview exists
-      let designFileBase64 = "Not available";
-      if (designPreview) {
-        const response = await fetch(designPreview);
-        const blob = await response.blob();
-        designFileBase64 = await new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result.split(',')[1]);
-          reader.readAsDataURL(blob);
-        });
-      }
-
-      const emailParams = {
-        to_name: "Glorious Creations Team",
-        from_name: user?.username || "Customer",
-        from_email: user?.email || "customer@example.com",
-        design_details: JSON.stringify({
-          id: responseData.id || "N/A",
-          colors: designData.colors,
-          quantity: designData.quantity,
-          sizes: designData.sizes,
-          designFile: designFileBase64,
-          userId: user?.userId || "N/A"
-        }, null, 2),
-        reply_to: user?.email || "customer@example.com"
+      // Create a hidden form element
+      const form = document.createElement("form");
+      form.style.display = "none";
+      
+      // Add fields to the form
+      const addField = (name, value) => {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = name;
+        input.value = value;
+        form.appendChild(input);
       };
 
-      await emailjs.send(
+      addField("to_name", "Glorious Creations Team");
+      addField("from_name", user?.username || "Customer");
+      addField("from_email", user?.email || "customer@example.com");
+      addField("message", `Upload Successful: ${JSON.stringify(designData, null, 2)}`);
+      addField("reply_to", user?.email || "customer@example.com");
+
+      document.body.appendChild(form);
+
+      await emailjs.sendForm(
         "service_oi6vx5n",
         "template_vzyxdek",
-        emailParams,
+        form,
         "UNjfGikVEcTG6vuKO"
       );
-      
-      setEmailStatus({ success: true, message: "✅ Design details emailed successfully!" });
+
+      document.body.removeChild(form);
+      setIsMessageSent(true);
     } catch (error) {
       console.error("❌ Email sending failed:", error);
-      setEmailStatus({ success: false, message: "❌ Failed to send design email" });
       throw error;
     }
   };
@@ -96,7 +90,7 @@ function Design() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setEmailStatus(null);
+    setIsMessageSent(false);
 
     try {
       if (!designFile) {
@@ -110,16 +104,21 @@ function Design() {
       formData.append("designFile", designFile);
       formData.append("userId", user?.userId);
 
-      console.log("📤 Sending FormData:", formData);
-
       // Upload the design and get response
       const response = await mutateAsync(formData);
       
-      // Send email with complete design details
-      await sendDesignEmail(
-        { colors, quantity, sizes },
-        { id: response.id }
-      );
+      // Prepare data for email
+      const emailData = {
+        id: response.id,
+        colors: colors,
+        quantity: quantity,
+        sizes: sizes,
+        designFile: designPreview ? "Image data available" : "No image",
+        userId: user?.userId || "N/A"
+      };
+      
+      // Send email with design details
+      await sendDesignEmail(emailData);
       
       alert("✅ Design uploaded and details emailed successfully!");
     } catch (error) {
@@ -199,9 +198,9 @@ function Design() {
         </div>
       </form>
 
-      {emailStatus && (
-        <div className={`status-message ${emailStatus.success ? "success" : "error"}`}>
-          {emailStatus.message}
+      {isMessageSent && (
+        <div className="success-message">
+          <p>Your design details have been sent successfully!</p>
         </div>
       )}
 
