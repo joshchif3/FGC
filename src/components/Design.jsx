@@ -19,27 +19,18 @@ function Design() {
     }
   };
 
-  // Convert file to Base64
-  const toBase64 = (file) =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = (error) => reject(error);
-    });
-
-  // Upload design function
-  const uploadDesign = async (payload) => {
+  // Upload design function using FormData
+  const uploadDesign = async (formData) => {
     try {
       const token = localStorage.getItem("authToken");
-
       if (!token) {
         throw new Error("❌ No authentication token found. Please log in.");
       }
 
-      const response = await api.post("/api/designs/upload", payload, {
+      const response = await api.post("/api/designs/upload", formData, {
         headers: {
           Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
         },
       });
 
@@ -67,22 +58,18 @@ function Design() {
         throw new Error("❌ Please upload a design file.");
       }
 
-      // Convert the file to Base64
-      const fileBase64 = await toBase64(designFile);
+      // Prepare FormData payload
+      const formData = new FormData();
+      formData.append("colors", colors);
+      formData.append("quantity", parseInt(quantity, 10));
+      formData.append("sizes", sizes);
+      formData.append("designFile", designFile);
+      formData.append("userId", user?.userId);
 
-      // Prepare the payload
-      const payload = {
-        colors,
-        quantity: parseInt(quantity, 10), // Ensure quantity is a number
-        sizes,
-        designFile: fileBase64,
-        userId: user?.userId, // Use the logged-in user's ID
-      };
-
-      console.log("📤 Sending payload:", payload);
+      console.log("📤 Sending FormData:", formData);
 
       // Upload the design
-      await mutateAsync(payload);
+      await mutateAsync(formData);
       alert("✅ Design uploaded successfully!");
     } catch (error) {
       console.error("❌ Upload Failed:", error);
