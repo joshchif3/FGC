@@ -128,7 +128,7 @@ function Design() {
   };
 
   return (
-    <div className="design-page">
+    <div className="design-page">+
       <div className="design-header">
         <h2>Design Your Custom Product</h2>
         <p>Upload your design and provide details to place your order.</p>

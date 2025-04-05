@@ -35,7 +35,7 @@ function Home() {
         <h3>Some Custom Products We’ve Made</h3>
         <div className="showcase-grid">
           <div className="showcase-item">
-            <img src="/images/hoodies.jpg" alt="Custom Hoodies" />
+            <img src="/images/hoodies.png" alt="Custom Hoodies" />
             <p>Hoodies</p>
           </div>
           <div className="showcase-item">
